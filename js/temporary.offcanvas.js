@@ -1,11 +1,11 @@
-/**
+﻿/**
  * Plugin temporary.offcanvas
  * A jQuery plugin for creating easy off canvas from out the screen
  *
  * http://temporarytrick.com/project/offcanvas/
  *
  * Copyright 2014, Siraphob Rhompo
- * Temporary�Trick
+ * Temporary•Trick
  * http://temporarytrick.com
  *
  * Licensed under GPL & MIT
