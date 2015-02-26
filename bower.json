@@ -1,0 +1,22 @@
+{
+  "name": "temporary.offcanvas",
+  "version": "1.0.0",
+  "homepage": "https://github.com/trickpeeraze/temporary.offcanvas",
+  "authors": [
+    "Siraphob Rhompo <trickpeeraze@gmail.com>"
+  ],
+  "description": "A jQuery plugin for magic canvas on your web",
+  "main": "index.html",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery.transit": "~0.9.12",
+    "jquery": "~2.1.3"
+  }
+}
