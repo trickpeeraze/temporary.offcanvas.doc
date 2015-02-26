@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>jQuery temporary.offcanvas | temporary•trick</title>
+<link rel='stylesheet' id='offcanvas-style-css'  href='style.css' type='text/css' media='all' />
+<link rel='stylesheet' id='highlight-style-css'  href='css/obsidian.css' type='text/css' media='all' />
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>  
+<script src="js/jquery.transit.min.js"></script>
+<script src="js/temporary.offcanvas.js"></script>
+<script src="js/highlight.pack.js"></script>
+<script src="js/main.js"></script>
+
+</head>
+
+<body>
+
+	<div id="wrapper">
+		<div class="container getFullHeight">
+			<div class="page">
+				<div class="page-container">
+					<header>
+						<div class="row">
+							<div class="col">
+								<h1 class="title">Temporary.offcanvas</h1>
+								<h4 class="sub-title">push &#8226; pull &#8226; panel &#8226; practice</h4>
+								<hr />
+							</div>
+						</div>
+					</header>
+					<div class="content">
+						<div class="row">
+							<div class="col">
+								<p class="intro">Temporary.offcanvas is a jQuery plugin for setting up the popular feature |offcanvas| to your website with ease. Custom the plugin and use on your site please see the instruction below.</p>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col">
+								<h2>Getting Started</h2>
+								<p>This jQuery Plugin require jQuery 1.10+ Library and <a href="http://ricostacruz.com/jquery.transit/" title="jquery.transit">jquery.transit</a> plugin of <a href="https://github.com/rstacruz" title="ricostacruz">@ricostacruz</a> <br>
+								<small>At my first state, I need help from other libraries to make a job done and running smooth. Using of jquery.transit is good and then can also  be used its cool feature on your site.</small></p>
+								<br>
+								<p>first you have to download the source code from <a href="#" class="btn-download">here</a> or my <a href="https://github.com/trickpeeraze/temporary.offcanvas" target="_blank" class="btn-github">Github</a></p>
+								<br>
+								<p>Now add this to the head of your document:</p>
+<pre><code class="html">	&lt;script src=&quot;jquery.min.js&quot; &gt;&lt;/script&gt;
+	&lt;script src=&quot;jquery.transit.min.js&quot; &gt;&lt;/script&gt;
+	&lt;script src=&quot;temporary.offcanvas.js&quot; &gt;&lt;/script&gt;
+	
+	&lt;!-- Optional --&gt;
+	&lt;script src=&quot;jquery.easing.js&quot; &gt;&lt;/script&gt;
+</code></pre>
+								<p>and now put the script: <br>
+								<small>the canvas will be out from an element you bind with the main jQuery object.</small></p>
+<pre><code>canvas = $('.container').offcanvas({
+	// size is a required option
+	size: '250'
+	// and add some content to the canvas
+	content:'some content in the canvas',
+});</code></pre>
+								<p>or with these options: <br>
+								<small>see more information all <a href="#" class="btn-option" >option</a> and description.</small></p>
+<pre><code>canvas = $('.container').offcanvas({
+	// all option and its default value
+	content: '',
+	size: 0,
+	position: 'right',
+	canvasClass: 'temp-canvas-wrapper',
+	canvasPadding: '15px',
+	offset: 0,
+	duration: 220,
+	easing: 'linear',
+	toggleButton: '',
+	pushAndPull: false,
+	tapToClose: false,
+	swipeToClose: false,
+	onBeforeOpen: function(){},
+	onOpen: function(){},
+	onBeforeClose: function(){},
+	onClose: function(){}
+});</code></pre>
+<p>then use offCanvas API method to manage your canvas:<br>
+<small>see more information all API <a href="#" class="btn-method" >methods</a> and description.</small></p>
+<pre><code>$('#some').on('click', function(){
+	canvas.open();
+	return false;
+});
+</code></pre>
+<p>That's it! <br><small>see more at the examples section</small></p>
+							</div>
+						</div>
+						
+						<div class="row">
+							<div class="col">
+								<h2>Examples</h2>
+							</div>
+						</div>
+						<div class="example-content">
+							<div class="row example-block">
+								<div class="col col-2">
+									<h3>Toggle Button</h3>
+									<p>Using <code>[toggleButton]</code> option to automatic bind open/close button (toggle) without extra coding by
+									putting a jQuery button element through the option value</p>
+									<a href="#" id="btn-exp1">toggle</a>
+									<pre><code> toggleButton: $('some button') </code></pre>
+									<p>or you can write your own toggle function by using the API method: this is simply example one</p>
+<pre><code>$('some button').on('click', function(){
+	// cv is canvas object
+	if(cv.isClose){
+		cv.open();
+	} else {
+		cv.close();
+	}
+	return false;
+});</code></pre>
+								</div>
+								<div class="col col-2">
+									<div id="exp1"><img src="images/layout.gif" alt=""></div>
+								</div>
+								<script>
+									var exp1 = $('#exp1').offcanvas({
+										content: '<h3>Toggle Button</h3><p>example data in canvas</p>',
+										size: '120',
+										toggleButton: $('#btn-exp1'),
+										fixedPosition: false
+									});
+								</script>
+							</div>
+							<div class="row example-block">
+								<div class="col col-2">
+									<h3>Position</h3>
+									<p>Using <code>[position]</code> to specific your position of the canvas. It can be possible with 'left', 'right' (default), 'top', and 'bottom'. </p>
+									<a href="#" id="btn-exp2-top">top</a>
+									<a href="#" id="btn-exp2-right">right</a>
+									<a href="#" id="btn-exp2-bottom">bottom</a>
+									<a href="#" id="btn-exp2-left">left</a>
+									<pre><code>	position: 'top'	</code></pre>
+								</div>
+								<div class="col col-2">
+									<div id="exp2"><img src="images/layout.gif" alt=""></div>
+								</div>
+								<script>
+									$('#exp2').offcanvas({
+										content: '<h3>TOP</h3><p>example top data in canvas</p>',
+										size: '100',
+										toggleButton: $('#btn-exp2-top'),
+										position: 'top',
+										fixedPosition: false
+									});
+									$('#exp2').offcanvas({
+										content: '<h3>RIGHT</h3><p>example right data in canvas</p>',
+										size: '300',
+										toggleButton: $('#btn-exp2-right'),
+										position: 'right',
+										fixedPosition: false
+									});
+									$('#exp2').offcanvas({
+										content: '<h3>BOTTOM</h3><p>example bottom data in canvas</p>',
+										size: '120',
+										toggleButton: $('#btn-exp2-bottom'),
+										position: 'bottom',
+										fixedPosition: false
+									});
+									$('#exp2').offcanvas({
+										content: '<h3>LEFT</h3><p>example left data in canvas</p>',
+										size: '100',
+										toggleButton: $('#btn-exp2-left'),
+										position: 'left',
+										fixedPosition: false
+									});
+								</script>
+							</div>
+							<div class="row example-block">
+								<div class="col col-2">
+									<div id="exp3"><img src="images/layout.gif" alt=""></div>
+								</div>
+								<div class="col col-2">
+									<h3>Push Pull and Tab</h3>
+									<p>Using <code>[pushAndPull]</code> set it to <b>true</b> when you need the whole area be put agaist the direction of the canvas position. and <code>[tapToClose]</code> the canvas can be closed with click anywhere else on the page. </p>
+									<a href="#" id="btn-exp3">push</a>
+									<p>&lt;mark-up&gt;</p>
+									<pre><code class="html">&lt;div id=&quot;example-push&quot;&gt;
+	&lt;div class=&quot;content&quot;&gt;
+		&lt;div&gt;&lt;/div&gt;
+		&lt;div&gt;&lt;/div&gt;
+		...
+		&lt;div&gt;&lt;/div&gt;
+	&lt;/div&gt;
+&lt;/div&gt; </code></pre>
+									<p>&lt;script&gt;</p>
+									<pre><code>exp1 = $('#example-push').offcanvas({
+	content: 'content ...',
+	size: '25%',
+	position: 'left',
+	pushAndPull: true,
+	tapToClose: true
+});</code></pre>
+								</div>
+								
+								<script>
+									var exp1 = $('#exp3').offcanvas({
+										content: '<h3>Push Pull Tab</h3><p>example data in canvas</p>',
+										size: '25%',
+										position: 'left',
+										pushAndPull: true,
+										tapToClose: true,
+										toggleButton: $('#btn-exp3'),
+										fixedPosition: false
+									});
+								</script>
+							</div>
+							<div class="row example-block">
+								<div class="col col-2">
+									<h3>more examples will come soon...</h3>
+									<p>Now you see the idea? trying to adapt using on your work. Good luck :) </p>
+									<p><small>give me any feedback, comment, suggestion, or report any bugs on my Github</small></p>
+								</div>
+								<div class="col col-2"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="fix-right getFullHeight">
+				<div class="brand-logo"><a href="http://temporarytrick.com" title="Temporary&#8226;Trick"><img src="images/logo.png" alt="Trick"></a></div>
+				<h1 class="title">Temporary .offcanvas</h1>
+				<div class="topMenu row">
+					<ul class="menu">
+						<li><a href="#" id="usage">Usage</a></li>
+						<li><a href="#" id="options">Options</a></li>
+						<li><a href="#" id="methods">Methods&amp;API</a></li>
+						<li><a href="#" id="download">Download</a></li>
+						<li><a href="#" id="changelog">Changelog</a></li>
+						<li><a href="https://github.com/trickpeeraze/temporary.offcanvas" target="_blank" id="github"><i class="fa fa-github"></i> GitHub</a></li>
+					</ul>
+				</div>
+				<div class="footer">
+					<p>2014 &copy; copyright</p>
+					<p><a href="http://temporarytrick.com">site</a> | <a href="http://temporarytrick.com">blog</a> | <a href="http://temporarytrick.com">projetcs</a></p>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	
+	<!-- TEMPLATES -->
+	<div id="usage_panel">
+	<h2>Usage</h2>
+	<p>Call the plugin by using .offcanvas() add parameter as an object of option. offcanvas object will be returned then you can use offcanvas API methods.</p>
+<pre><code>canvasObject = $('viewport selector').offcanvas();</code></pre>
+	</div>
+	<div id="option_panel">
+		<h2>Options</h2>
+		<table>
+			<tr>
+				<th>Name</th>
+				<th>Type</th>
+				<th>Default</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td class="section" colspan="4">Config</td>
+			</tr>
+			<tr>
+				<td>content</td>
+				<td>Text | HTML | $(Object)</td>
+				<td>empty</td>
+				<td>
+					<p>The content inside the canvas it can be text, HTML, or even jQuery object</p> 
+					<p><i>note:</i> if the jQuery object is input that element will be moved into the canvas autometically</p>
+				</td>
+			</tr>
+			<tr>
+				<td>size</td>
+				<td>pixel unit</td>
+				<td>0</td>
+				<td>
+					<p>Size of the canves represented as heigth if <i>position</i> is set to 'top' or 'bottom' and as width if it is set to 'left' or 'right'. </p>
+					<p><i>note:</i> the unit can be set in percentage.</p>
+				</td>
+			</tr>
+			<tr>
+				<td>position</td>
+				<td>top | right | bottom | left</td>
+				<td>right</td>
+				<td><p>specific where is the position of the canvas while it is showing.</p></td>
+			</tr>
+			<tr>
+				<td>canvasClass</td>
+				<td>string</td>
+				<td>temp-canvas-wrapper</td>
+				<td><p>css class specific in the canvas wrapper.</p></td>
+			</tr>
+			<tr>
+				<td>canvasPadding</td>
+				<td>padding unit</td>
+				<td>15px</td>
+				<td><p>padding inside between canvas and content.</p></td>
+			</tr>
+			<tr>
+				<td>offset</td>
+				<td>pixel unit</td>
+				<td>0</td>
+				<td><p>that is when you need to set some distance from the edge of the parent direction is related to the <i>position</i> </p></td>
+			</tr>
+			<tr>
+				<td>duration</td>
+				<td>Number</td>
+				<td>220</td>
+				<td><p>period of time of canvas slide animation.</p></td>
+			</tr>
+			<tr>
+				<td>easing</td>
+				<td>Easing Type</td>
+				<td>linear</td>
+				<td><p>easing slide effect. You can use jquery.easing to extend more ease effects</p></td>
+			</tr>
+			<tr>
+				<td>toggleButton</td>
+				<td>$(Object)</td>
+				<td>empty</td>
+				<td><p>an jQuery object that represented as button to click open and close the canvas automatically in easiest way.</p></td>
+			</tr>
+			<tr>
+				<td>fixedPosition</td>
+				<td>Boolean</td>
+				<td>true</td>
+				<td><p>in case that your canvas is not fixed on the page but within an element this option is necessary to set to <b>false</b>.</p>
+				<p><i>note:</i> if it is set to <b>false</b> within the element that element cannot to scroll (because of effect of <i>overflow:hidden</i>).</p></td>
+			</tr>
+			<tr>
+				<td>pushAndPull</td>
+				<td>Boolean</td>
+				<td>false</td>
+				<td><p>option to set it whether when the canvas is opened the whole area will be pushed by the canvas instead of floating over.</p></td>
+			</tr>
+			<tr>
+				<td>tapToClose</td>
+				<td>Boolean</td>
+				<td>false</td>
+				<td><p>option to set it whether when the user clicks anywhere but canvas, the canvas will be closed auto.</p></td>
+			</tr>
+			<tr>
+				<td>swipeToClose</td>
+				<td>Boolean</td>
+				<td>false</td>
+				<td><p>option that support for <u>mobile</u> when user need to close the canvas just swipe agianst to the position of the canvas.</p></td>
+			</tr>
+			<tr>
+				<td class="section" colspan="4">Events</td>
+			</tr>
+			<tr>
+				<td>onBeforeOpen</td>
+				<td>function()</td>
+				<td>empty</td>
+				<td><p>fire an event function while the canvas is opening.</p></td>
+			</tr>
+			<tr>
+				<td>onOpen</td>
+				<td>function()</td>
+				<td>empty</td>
+				<td><p>fire an event function when the canvas is opened.</p></td>
+			</tr>
+			<tr>
+				<td>onBeforeClose</td>
+				<td>function()</td>
+				<td>empty</td>
+				<td><p>fire an event function when the canvas is closing.</p></td>
+			</tr>
+			<tr>
+				<td>onClose</td>
+				<td>function()</td>
+				<td>empty</td>
+				<td><p>fire an event function when the canvas is closed.</p></td>
+			</tr>
+		</table>
+	</div>
+	<div id="method_panel">
+		<h2>Method &amp; API</h2>
+		<table>
+			<tr>
+				<th>Name</th>
+				<th>Type</th>
+				<th>Return</th>
+				<th>Description</th>
+			</tr>
+			<tr>
+				<td>open()</td>
+				<td>Method</td>
+				<td>void</td>
+				<td>
+					<p>a function that triggers the canvas to open.</p> 
+				</td>
+			</tr>
+			<tr>
+				<td>close()</td>
+				<td>Method</td>
+				<td>void</td>
+				<td>
+					<p>a function that triggers the canvas to close.</p>
+				</td>
+			</tr>
+			<tr>
+				<td>isOpen</td>
+				<td>API</td>
+				<td>Boolean</td>
+				<td><p>an API that check whether the canvas has being opened or not.</p></td>
+			</tr>
+			<tr>
+				<td>isClose</td>
+				<td>API</td>
+				<td>Boolean</td>
+				<td><p>an API that check whether the canvas has being closed or not.</p></td>
+			</tr>
+			<tr>
+				<td>destroy</td>
+				<td>Method</td>
+				<td>void</td>
+				<td><p>a function that destroy the canvas object.</p></td>
+			</tr>
+		</table>
+	</div>
+	<div id="download_panel">
+		<h2>Download</h2>
+		<div class="row">
+			<div class="col col-3">
+				<p>temporary.offcanvas ( <i class="fa fa-code"></i> BETA v1.0)
+					<ul>
+						<li><a target="_blank" href="js/temporary.offcanvas.min.js">compressed</a> ( <i class="fa fa-file-code-o"></i> 3.07KB)</li>
+						<li><a target="_blank" href="js/temporary.offcanvas.js">normal</a> ( <i class="fa fa-file-code-o"></i> 6.34KB)</li>
+					</ul>
+				</p>
+			</div>
+			<div class="col col-3">
+				<p>jquery.transit
+					<ul>
+						<li><a target="_blank" href="http://ricostacruz.com/jquery.transit/" title="jquery.transit">goto</a> <i class="fa fa-external-link"></i></li>
+					</ul>
+				</p>
+			</div>
+			<div class="col col-3">
+				<p>jquery.easing
+					<ul>
+						<li><a target="_blank" href="http://gsgd.co.uk/sandbox/jquery/easing/" title="jquery.easing">goto</a> <i class="fa fa-external-link"></i></li>
+					</ul>
+				</p>
+			</div>
+		</div>
+		
+		
+	</div>
+	<div id="changelog_panel">
+		<h2>Changelog</h2>
+		<h4>2 July 2014</h4>
+		<ul>
+			<li>Release Beta v1.0</li>
+		</ul>
+	<div>
+</body>
+</html>

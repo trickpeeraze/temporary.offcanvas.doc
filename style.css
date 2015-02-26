@@ -1,0 +1,345 @@
+@import url('css/normalize.css');
+@import url('css/font-awesome.min.css');
+@import url(http://fonts.googleapis.com/css?family=Source+Code+Pro:200,400);
+@import url(http://fonts.googleapis.com/css?family=Raleway:400,700);
+
+html,
+button,
+input,
+select,
+textarea {
+    color: #333;
+}
+
+html {
+    font-size: 1em;
+    line-height: 1.4;
+}
+
+a {
+	color: #333;
+}
+body{
+	font-family: 'Raleway', sans-serif;
+	font-weight: 400;
+}
+h1, h2, h3, h4, h5, h6{}
+
+h1{
+	font-family: "Source Code Pro", "Courier New", Courier, monospace;
+	font-weight: 200;
+}
+h2{
+	font-size: 32px;
+	font-weight: 300;
+	text-transform: uppercase;
+}
+*,*:before,*:after{-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;}
+::-moz-selection { background: #b3d4fc; text-shadow: none; }
+::selection { background: #b3d4fc; text-shadow: none; }
+hr { display: block; height: 1px; border: 0; border-top: 1px solid #ccc; margin: 1em 0; padding: 0; }
+
+audio, canvas, img, video { vertical-align: middle; }
+
+textarea {
+    resize: vertical;
+}
+
+img { width:100%; height:auto; }
+
+html, body{ }
+table {
+    width: 100%;
+}
+tr {}
+th, td {
+	padding: 8px;
+	font-size: 14px;
+	border: 1px solid #fff;
+}
+tr:nth-child(2n) td{
+	background-color: #F3F3F3;
+}
+tr:nth-child(2n-1) td{
+    background-color: #E9E9E9;
+}
+td:first-child {
+    text-decoration: underline;
+}
+th {
+    border-bottom: 1px solid;
+}
+td {}
+td p{
+	margin:0;
+	padding-bottom:8px;
+}
+td p:last-child{
+	padding-bottom:0;
+}
+td.section {
+	text-decoration: none;
+	color: #0B9231;
+	padding-bottom: 2px;
+	padding-top: 12px;
+	padding-left: 18px;
+}
+tr td.section{
+	background-color: #FFF;
+}
+#wrapper{
+	margin:0 auto;
+	position:relative;
+	width: 100%;
+}
+.container {
+	margin:0 auto;
+}
+
+.row:before,
+.row:after {
+	content: " "; /* 1 */
+	display: table; /* 2 */
+}
+
+.row:after {
+	clear: both;
+}
+
+.row {
+	*zoom: 1;
+}
+.col{ padding: 0 8px; float:left; width:100%;}
+.col-2{ width:50%;  }
+.col-3{ width:33.3%; }
+.col-4{ width:25%; } 
+
+.fix-right{
+background: #000000; /* Old browsers */
+background: -moz-linear-gradient(45deg,  #000000 21%, #383838 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left bottom, right top, color-stop(21%,#000000), color-stop(100%,#383838)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(45deg,  #000000 21%,#383838 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(45deg,  #000000 21%,#383838 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(45deg,  #000000 21%,#383838 100%); /* IE10+ */
+background: linear-gradient(45deg,  #000000 21%,#383838 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#000000', endColorstr='#383838',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+position:fixed;
+right:0;
+	
+top: 0;
+width: 145px;
+z-index: 1;
+}
+.fix-right .title{
+	font-size: 32px;
+	color: #0B9231;
+	padding: 0 15%;
+	text-align: right;
+	word-wrap: break-word;
+}
+.box-shadow-d1{
+	box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+}
+.box-shadow-d2{
+	box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
+}
+.option-panel{
+	background-color: #FFF;
+}
+.topMenu{}
+.topMenu ul{
+text-align: left;
+list-style: none;
+padding-left: 0;
+font-size: 14px;
+margin-top: 0;
+}
+.topMenu li{
+display: block;
+}
+.topMenu a{
+    color: #C4C4C4;
+    display: block;
+    padding: 10px 10px 10px 15%;
+    text-decoration: none;
+    border-top: 1px solid #202020;
+    border-bottom: 1px solid #3D3D3D;
+}
+.topMenu a.active{
+    background-color: #252525;
+}
+.topMenu a:hover{
+    background-color: #292929;
+}
+.topMenu li:first-child a {border-top: none;}
+.topMenu li:last-child a {border-bottom: none;}
+.temp-canvas-wrapper{
+	background-color:#EEE;
+	font-size:60%;
+}
+.brand-logo{
+    background-color: #FFF;
+    border-radius: 50%;
+    width: 62%;
+    margin: 25px auto;
+}
+.brand-logo img{}
+
+.fix-right .footer{
+    position: absolute;
+    bottom: 10px;
+    text-align: center;
+    width: 100%;
+    font-size: 11px;
+    color: #8A8A8A;
+    letter-spacing: 0.03em;
+}
+.fix-right .footer p{
+    margin: 0 0 3px;
+}
+.fix-right .footer a{
+    color: #0B9231;
+}
+
+.page{}
+.page a{
+	border: 1px solid;
+	border-radius: 10px;
+	padding: 0 8px;
+	text-decoration: none;
+	-webkit-transition: background-color 150ms linear;
+	   -moz-transition: background-color 150ms linear;
+		     transition: background-color 150ms linear;
+}
+.page a:hover, .page a.active{
+	background-color: #EEE;
+}
+.page-container{
+    width: 68%;
+    margin: 0 auto;
+}
+.page h1{
+	font-size: 55px;
+	text-align: center;
+	margin-bottom: 0;
+	margin-top: 60px;
+	color: #666;
+}
+.page h4{
+    text-align: center;
+    margin-top: 0;
+    text-transform: uppercase;
+    font-weight: 400;
+    margin-bottom: 25px;
+    letter-spacing: 6px;
+    font-size: 13px;
+}
+
+.page .intro{
+    text-align: center;
+}
+.example-content .example-block{
+	border-top: 1px solid #DDD;
+	margin-bottom: 10px;
+	padding-top: 10px;
+}
+.example-content .example-block:first-child{
+	border-top: none;
+}
+
+@media only screen 
+and (min-width : 768px){
+
+.container {}
+.col-2-desktop{ width:50%;  }
+.col-3-desktop{ width:33.3%; }
+.col-4-desktop{ width:25%; } 
+
+.page{ margin-right: 145px; margin-bottom: 50px;}
+}
+/* ==========================================================================
+   Helper classes
+   ========================================================================== */
+.full-width{ width:100%; }
+.floatLeft{ float:left !important; }
+.floatRight{ float:right !important; }
+/*
+ * Image replacement
+ */
+
+.ir {
+    background-color: transparent;
+    border: 0;
+    overflow: hidden;
+    /* IE 6/7 fallback */
+    *text-indent: -9999px;
+}
+
+.ir:before {
+    content: "";
+    display: block;
+    width: 0;
+    height: 150%;
+}
+
+/*
+ * Hide from both screenreaders and browsers: h5bp.com/u
+ */
+
+.hidden {
+    display: none !important;
+    visibility: hidden;
+}
+
+/*
+ * Hide only visually, but have it available for screenreaders: h5bp.com/v
+ */
+
+.visuallyhidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+/*
+ * Extends the .visuallyhidden class to allow the element to be focusable
+ * when navigated to via the keyboard: h5bp.com/p
+ */
+
+.visuallyhidden.focusable:active,
+.visuallyhidden.focusable:focus {
+    clip: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    position: static;
+    width: auto;
+}
+
+/*
+ * Hide visually and from screenreaders, but maintain layout
+ */
+
+.invisible {
+    visibility: hidden;
+}
+
+.clearfix:before,
+.clearfix:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+.clearfix {
+    *zoom: 1;
+}
