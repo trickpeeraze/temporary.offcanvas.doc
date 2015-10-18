@@ -2,26 +2,26 @@
 <html>
 <head>
 
-<meta charset="utf8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="utf8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>jQuery temporary.offcanvas | temporary•trick</title>
-<link rel='stylesheet' id='offcanvas-style-css'  href='style.css' type='text/css' media='all' />
-<link rel='stylesheet' id='highlight-style-css'  href='css/obsidian.css' type='text/css' media='all' />
+	<title>jQuery temporary.offcanvas | temporary•trick</title>
+	<link rel="stylesheet" id="offcanvas-style-css"  href="style.css" type="text/css" media="all" />
+	<link rel="stylesheet" id="highlight-style-css"  href="css/obsidian.css" type="text/css" media="all" />
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>  
-<script src="js/jquery.transit.min.js"></script>
-<script src="js/temporary.offcanvas.js"></script>
-<script src="js/highlight.pack.js"></script>
-<script src="js/main.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+	<script src="js/jquery.transit.min.js"></script>
+	<script src="js/temporary.offcanvas.js"></script>
+	<script src="js/highlight.pack.js"></script>
+	<script src="js/main.js"></script>
 
 </head>
 
 <body>
 
 	<div id="wrapper">
-		<div class="container getFullHeight">
+		<div class="container getFullHeight" id="container">
 			<div class="page">
 				<div class="page-container">
 					<header>
@@ -75,7 +75,7 @@
 	offset: 0,
 	duration: 220,
 	easing: 'linear',
-	toggleButton: '',
+	toggleButtonSelector: '',
 	pushAndPull: false,
 	tapToClose: false,
 	swipeToClose: false,
@@ -104,10 +104,10 @@
 							<div class="row example-block">
 								<div class="col col-2">
 									<h3>Toggle Button</h3>
-									<p>Using <code>[toggleButton]</code> option to automatic bind open/close button (toggle) without extra coding by
+									<p>Using <code>[toggleButtonSelector]</code> option to automatic bind open/close button (toggle) without extra coding by
 									putting a jQuery button element through the option value</p>
 									<a href="#" id="btn-exp1">toggle</a>
-									<pre><code> toggleButton: $('some button') </code></pre>
+									<pre><code> toggleButtonSelector: $('some button') </code></pre>
 									<p>or you can write your own toggle function by using the API method: this is simply example one</p>
 <pre><code>$('some button').on('click', function(){
 	// cv is canvas object
@@ -123,10 +123,10 @@
 									<div id="exp1"><img src="images/layout.gif" alt=""></div>
 								</div>
 								<script>
-									var exp1 = $('#exp1').offcanvas({
+									new offcanvas('exp1', {
 										content: '<h3>Toggle Button</h3><p>example data in canvas</p>',
 										size: '120',
-										toggleButton: $('#btn-exp1'),
+										toggleButtonSelector: '#btn-exp1',
 										fixedPosition: false
 									});
 								</script>
@@ -145,31 +145,31 @@
 									<div id="exp2"><img src="images/layout.gif" alt=""></div>
 								</div>
 								<script>
-									$('#exp2').offcanvas({
+									new offcanvas('exp2', {
 										content: '<h3>TOP</h3><p>example top data in canvas</p>',
 										size: '100',
-										toggleButton: $('#btn-exp2-top'),
+										toggleButtonSelector: '#btn-exp2-top',
 										position: 'top',
 										fixedPosition: false
 									});
-									$('#exp2').offcanvas({
+									new offcanvas('exp2', {
 										content: '<h3>RIGHT</h3><p>example right data in canvas</p>',
 										size: '300',
-										toggleButton: $('#btn-exp2-right'),
+										toggleButtonSelector: '#btn-exp2-right',
 										position: 'right',
 										fixedPosition: false
 									});
-									$('#exp2').offcanvas({
+									new offcanvas('exp2', {
 										content: '<h3>BOTTOM</h3><p>example bottom data in canvas</p>',
 										size: '120',
-										toggleButton: $('#btn-exp2-bottom'),
+										toggleButtonSelector: '#btn-exp2-bottom',
 										position: 'bottom',
 										fixedPosition: false
 									});
-									$('#exp2').offcanvas({
+									new offcanvas('exp2', {
 										content: '<h3>LEFT</h3><p>example left data in canvas</p>',
 										size: '100',
-										toggleButton: $('#btn-exp2-left'),
+										toggleButtonSelector: '#btn-exp2-left',
 										position: 'left',
 										fixedPosition: false
 									});
@@ -203,13 +203,13 @@
 								</div>
 								
 								<script>
-									var exp1 = $('#exp3').offcanvas({
+									new offcanvas('exp3', {
 										content: '<h3>Push Pull Tab</h3><p>example data in canvas</p>',
 										size: '25%',
 										position: 'left',
 										pushAndPull: true,
 										tapToClose: true,
-										toggleButton: $('#btn-exp3'),
+										toggleButtonSelector: '#btn-exp3',
 										fixedPosition: false
 									});
 								</script>
@@ -249,12 +249,12 @@
 	
 	
 	<!-- TEMPLATES -->
-	<div id="usage_panel">
+	<div id="usage_panel" class="hidden">
 	<h2>Usage</h2>
 	<p>Call the plugin by using .offcanvas() add parameter as an object of option. offcanvas object will be returned then you can use offcanvas API methods.</p>
 <pre><code>canvasObject = $('viewport selector').offcanvas();</code></pre>
 	</div>
-	<div id="option_panel">
+	<div id="option_panel" class="hidden">
 		<h2>Options</h2>
 		<table>
 			<tr>
@@ -321,10 +321,10 @@
 				<td><p>easing slide effect. You can use jquery.easing to extend more ease effects</p></td>
 			</tr>
 			<tr>
-				<td>toggleButton</td>
-				<td>$(Object)</td>
+				<td>toggleButtonSelector</td>
+				<td>string</td>
 				<td>empty</td>
-				<td><p>an jQuery object that represented as button to click open and close the canvas automatically in easiest way.</p></td>
+				<td><p>an query string of selector that represented as button to click open and close the canvas automatically in easiest way.</p></td>
 			</tr>
 			<tr>
 				<td>fixedPosition</td>
@@ -380,7 +380,7 @@
 			</tr>
 		</table>
 	</div>
-	<div id="method_panel">
+	<div id="method_panel" class="hidden">
 		<h2>Method &amp; API</h2>
 		<table>
 			<tr>
@@ -425,7 +425,7 @@
 			</tr>
 		</table>
 	</div>
-	<div id="download_panel">
+	<div id="download_panel" class="hidden">
 		<h2>Download</h2>
 		<div class="row">
 			<div class="col col-3">
@@ -454,12 +454,13 @@
 		
 		
 	</div>
-	<div id="changelog_panel">
+	<div id="changelog_panel" class="hidden">
 		<h2>Changelog</h2>
 		<h4>2 July 2014</h4>
 		<ul>
 			<li>Release Beta v1.0</li>
 		</ul>
-	<div>
+	</div>
+
 </body>
 </html>

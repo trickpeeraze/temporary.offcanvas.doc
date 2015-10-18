@@ -1,6 +1,6 @@
-﻿/**
+/**
  * Plugin temporary.offcanvas
- * A jQuery plugin for creating easy off canvas from out the screen
+ * A javascript library for creating easy off canvas from out the screen
  *
  * http://temporarytrick.com/project/offcanvas/
  *
@@ -11,267 +11,395 @@
  * Licensed under GPL & MIT
  *
  * Released on: May 6, 2014
- * @version  1.0
- * @depend   jquery
- * @depend   jquery.transit
- * @optional jquery.easing
+ * @version  2.0
  *
  */
- 
-(function($){
 
-	$.fn.offcanvas = function(option, callback){
-		var
-		defaults = {
-			debug: false,
-			content: '',
-			size: 0,
-			position: 'right',
-			canvasClass: 'temp-canvas-wrapper',
-			canvasPadding: '15px',
-			offset: 0,
-			duration: 220,
-			easing: 'linear',
-			toggleButton: '',
-			fixedPosition: true,
-			pushAndPull: false,
-			tapToClose: false,
-			swipeToClose: false,
-			onBeforeOpen: function(){},
-			onOpen: function(){},
-			onBeforeClose: function(){},
-			onClose: function(){}
-		},
-		option = $.extend({}, defaults, option),
-		parent = this,
-		_isOpen = false,
-		_isClose = true,
-		isOverlay = false,
-		move = {},
-		size = _calPixel(option.size),
-		offset = _calPixel(option.offset),
-		css = _cssInit();
-				
-		var canvas = $('<div>').addClass(option.canvasClass).css( css );
-		
-		if(option.content instanceof jQuery)
-			option.content.appendTo(canvas);
-		else
-			canvas.html(option.content);
-		
-		if(parent.css('position') === 'static')
-			parent.css('position','relative');
-			
-		parent.append(canvas);
-		
-		if(option.tapToClose || option.swipeToClose){
-			isOverlay = true;
-			var overlay = $('<div>', {
-				'class': 'canvas-overlay',
-				css: {
-					width: '100%',
-					height: '100%',
-					position: 'fixed',
-					top: 0,
-					cursor: 'pointer'
-				}
-			}).hide();
-			
-			if(! option.fixedPosition ){
-				overlay.css('position', 'absolute');
-			}
-			
-			canvas.before(overlay);
-			
-			if(option.tapToClose){
-				overlay.on('click', function(){
-					_close.call(parent);
-				} );
-			}
-			
-			if(option.swipeToClose){
-				overlay[0].addEventListener('touchstart', function(e){
-					var touchobj = e.changedTouches[0];
-					dist = { x:0, y:0 };
-					startX = touchobj.pageX;
-					startY = touchobj.pageY;
-					e.preventDefault();
+/* global module, document, window, setTimeout, clearTimeout */
+(function (root, factory, define) {
 
-				}, false);
-				
-				overlay[0].addEventListener('touchmove', function(e){
-					e.preventDefault(); // prevent scrolling when inside DIV
-				}, false);
-				
-				overlay[0].addEventListener('touchend', function(e){
-					var touchobj = e.changedTouches[0];
-					var threshold = 110;
-					dist.x = touchobj.pageX - startX;
-					dist.y = touchobj.pageY - startY;
-					switch (option.position){
-						/* swipe right */
-						case 'left':
-							if(	dist.x > 0 &&
-								dist.y < threshold &&
-								dist.y > -threshold ){
-								_close();
-							}
-							break;
-						/* swipe down */
-						case 'up':
-							if(dist.y > 0 && 
-								dist.x < threshold &&
-								dist.x > -threshold ){
-								_close();
-							}
-							break;
-						/* swipe left */
-						case 'right':
-							if(	dist.x < 0 && 
-								dist.y < threshold &&
-								dist.y > -threshold ){
-								_close();
-							}
-							break;
-						/* swipe up */
-						case 'down':
-							if(	dist.y < 0 && 
-								dist.x < threshold &&
-								dist.x > -threshold ){
-								_close();
-							}
-							break;
-					}
-					e.preventDefault();
+	if (typeof define === 'function' && define.amd) {
+		define([], factory);
+	} else if (typeof module === 'object' && module.exports) {
+		module.exports = factory();
+	} else {
+		root.offcanvas = factory();
+	}
 
-				}, false);
-			}
+}( this, function () {
+	return function (containerId, options) {
+
+		if (containerId === undefined) {
+			throw 'containerId is required.';
 		}
-		
-		if(typeof callback === 'function')
-			callback(canvas);
-		
-		/*
-			methods
-		*/
-		this.open    = _open;
-		this.close   = _close;
+
+		var
+			_this = this,
+			defaults = {
+				debug: false,
+				content: '',
+				size: 0,
+				position: 'right',
+				canvasClass: 'temp-canvas-wrapper',
+				canvasPadding: '15px',
+				offset: 0,
+				duration: 220,
+				easing: 'ease',
+				delay: 0,
+				fixedPosition: true,
+				pushAndPull: false,
+				tapToClose: true,
+				toggleButtonSelector: null,
+				onBeforeOpen: function(){},
+				onOpen: function(){},
+				onBeforeClose: function(){},
+				onClose: function(){}
+			},
+			option = merge(defaults, options),
+			elContainer = document.getElementById(containerId),
+			elPageOverlay = null,
+			elCanvas,
+			move,
+			poolingRate;
+
+		init();
+
+		/**
+		 * Properties
+		 */
 		this.isOpen  = false;
 		this.isClose = true;
-		this.destroy = _destroy;
-		
-		/* Private Functions */
-		function _open(callback){
-			option.onBeforeOpen.call(canvas); /* Event: before loaded */
-			if(this.isClose){
+
+		/**
+		 * Methods
+		 */
+		this.open = function (callback) {
+
+			if (!elCanvas) {
+				return;
+			}
+
+			callback = callback || option.onOpen;
+			option.onBeforeOpen(elCanvas, elContainer); /* Event: before loaded */
+
+			if (this.isClose) {
+
 				if(option.pushAndPull){
-					canvas.siblings().transition(move.on, option.duration, option.easing);
+					transition(elContainer.firstChild, move.on, option.duration, option.easing, option.delay);
 				}
-				
-				if(isOverlay)
-					overlay.show();
-					
-				canvas.transition(move.on, option.duration, option.easing, function(){
-					option.onOpen.call(canvas);
-					if(typeof callback === 'function')
-						callback.call(canvas);
-				});
-				
+
+				if (elPageOverlay) {
+					elPageOverlay.show();
+				}
+
+				elCanvas.open(callback);
+
 				this.isOpen  = true;
 				this.isClose = false;
 			}
-		}
-		
-		
-		function _close(callback){
-			option.onBeforeClose.call(canvas);
-			if(this.isOpen){
-				if(option.pushAndPull){
-					canvas.siblings().transition(move.off, option.duration, option.easing);
+
+		};
+
+
+		this.close = function (callback) {
+
+			if (!elCanvas) {
+				return;
+			}
+
+			callback = callback || option.onClose;
+			option.onBeforeClose(elCanvas, elContainer);
+
+			if (this.isOpen) {
+
+				if (option.pushAndPull) {
+					transition(elContainer.firstChild, move.off, option.duration, option.easing, option.delay);
 				}
-				
-				if(isOverlay)
-					overlay.hide();
-					
-				canvas.transition(move.off, option.duration, option.easing, function(){
-					option.onClose.call(canvas);
-					if(typeof callback === 'function')
-						callback.call(canvas);
-				});
+
+				if (elPageOverlay) {
+					elPageOverlay.hide();
+				}
+
+				elCanvas.close(callback);
+
 				this.isOpen  = false;
 				this.isClose = true;
 			}
-		}
-		if(option.toggleButton instanceof jQuery){
-			option.toggleButton.on('click' ,function(e){
-				if(parent.isClose){
-					$(this).addClass('active');
-					parent.open();
-				} else {
-					$(this).removeClass('active');
-					parent.close();
+
+		};
+
+		
+		this.resize = function () {
+			this.close();
+			resize(elCanvas, option.position, option.size);
+			calculateMove(option.position, option.size, option.offset);
+		};
+
+
+		this.destroy = function () {
+			elContainer.removeChild(elCanvas);
+		};
+
+		/**
+		 * Functions
+		 */
+		function init () {
+			calculateMove(option.position, option.size, option.offset);
+			elCanvas = createCanvas(option);
+			elCanvas.innerHTML = option.content;
+
+			if (elContainer.style.position !== 'absolute') {
+				elContainer.style.position = 'relative';
+			}
+
+			if(! option.fixedPosition ){
+				elContainer.style.overflow = 'hidden';
+			}
+
+			elContainer.appendChild(elCanvas);
+
+			if (option.tapToClose) {
+
+				elPageOverlay = createPageOverlay();
+				elContainer.insertBefore(elPageOverlay, elCanvas);
+
+				elPageOverlay.addEventListener('click', function () {
+					_this.close();
+				});
+
+			}
+
+			var btnNodeList = document.querySelectorAll(option.toggleButtonSelector);
+
+			if (btnNodeList.length) {
+				for (var i = 0; i < btnNodeList.length; ++i) {
+					bindButton(btnNodeList[i]);
 				}
+			}
+			
+			if ((/%$/).test(option.size)) {
+				window.addEventListener('resize', function () {
+
+					if (poolingRate) {
+						clearTimeout(poolingRate);
+					}
+
+					poolingRate = setTimeout(function () {
+						_this.resize();
+					}, 250);
+
+				}, false);
+			}
+
+		}
+
+
+		/* recalculate pixel from percentage unit by its elContainer */
+		function calculatePixel (val) {
+			return ( (/%$/).test(val) ) ? Math.floor(elContainer.offsetWidth * parseInt(val) / 100) : parseInt(val);
+		}
+
+
+		function bindButton (btn) {
+			btn.addEventListener('click' ,function (e) {
+				e.preventDefault();
+
+				if(_this.isClose){
+					_this.open();
+				} else {
+					_this.close();
+				}
+
 				return false;
-			});
+			}, false);
 		}
-		function _destroy(){
-			canvas.remove();
-		}
-		/* recalculate pixel from percentage unit by its parent */
-		function _calPixel(val){
-			return ( (/%$/).test(val) ) ? parent.outerWidth() * parseInt(val) / 100 : parseInt(val);
+
+
+		function createCanvas (option) {
+
+			var el = document.createElement('div');
+			el.setAttribute('class', option.canvasClass);
+			el.style.position  = (option.fixedPosition) ? 'fixed' : 'absolute';
+			el.style.padding   = option.canvasPadding;
+			el.style.boxSizing = 'border-box';
+			el.style.overflow  = 'auto';
+
+			resize(el, option.position, option.size);
+
+			el.open = function (callback) {
+				addClass(this, 'active');
+
+				if (option.toggleButtonSelector) {
+					addClass(document.querySelectorAll(option.toggleButtonSelector), 'active');
+				}
+
+				transition(this, move.on, option.duration, option.easing, option.delay, callback);
+			};
+
+			el.close = function (callback) {
+				removeClass(this, 'active');
+
+				if (option.toggleButtonSelector) {
+					removeClass(document.querySelectorAll(option.toggleButtonSelector), 'active');
+				}
+
+				transition(this, move.off, option.duration, option.easing, option.delay, callback);
+			};
+
+			return el;
 		}
 		
-		function _cssInit(){
-			var cssObj = {
-				position: 'fixed',
-				padding: option.canvasPadding,
-				boxSizing: 'border-box',
-				MozBoxSizing: 'border-box',
-				webkitBoxSizing: 'border-box',
-				overflow: 'auto'
+		
+		function resize (el, position, size) {
+			size = calculatePixel(size);
+
+			switch (position) {
+			case 'top':
+				el.style.height = toPixel(size);
+				el.style.top    = toPixel(size, true);
+				el.style.left   = 0;
+				el.style.width  = '100%';
+				break;
+			case 'bottom':
+				el.style.height = toPixel(size);
+				el.style.bottom = toPixel(size, true);
+				el.style.left   = 0;
+				el.style.width  = '100%';
+				break;
+			case 'left':
+				el.style.left   = toPixel(size, true);
+				el.style.width  = toPixel(size);
+				el.style.top    = 0;
+				el.style.height = '100%';
+				break;
+			case 'right':
+				el.style.width  = toPixel(size);
+				el.style.right  = toPixel(size, true);
+				el.style.top    = 0;
+				el.style.height = '100%';
+				break;
+			}
+
+		}
+
+
+		function toPixel (point, minus) {
+			minus = minus || false;
+			return (minus) ? (-point) + 'px' : point + 'px';
+		}
+
+
+		function transition (el, move, duration, easing, delay, callback) {
+			var x = move.x || 0;
+			var y = move.y || 0;
+
+			if (typeof callback === 'function') {
+				el.addEventListener('oanimationend animationend webkitAnimationEnd', function(e) {
+					e.target.removeEventListener(e.type, arguments.callee);
+					callback(el);
+				}, false);
+			}
+
+			el.style.transform = 'translate3d(0,0,0)';
+			el.style.transitionProperty = 'transform';
+			el.style.transitionDuration = duration + 'ms';
+			el.style.transitionTimingFunction = easing;
+			el.style.transitionDelay = delay;
+			el.style.transform = 'translate3d(' + toPixel(x) + ', ' + toPixel(y) + ',0)';
+		}
+
+
+		function addClass (el, name) {
+			var add = function (el, name) {
+				var cl = el.getAttribute('class');
+				el.setAttribute('class', cl + ' ' + name);
+			};
+
+			if (el.length) {
+				for (var i = 0; i < el.length; ++i) {
+					add(el[i], name);
+				}
+			} else {
+				add(el, name);
+			}
+
+		}
+
+
+		function removeClass (el, name) {
+			var remove = function (el, name) {
+				var cl = el.getAttribute('class');
+				el.setAttribute('class', cl.replace(name, '').trim());
 			};
 			
-			if(! option.fixedPosition ){
-				parent.css('overflow','hidden');
-				cssObj.position = 'absolute';
+			if (el.length) {
+				for (var i = 0; i < el.length; ++i) {
+					remove(el[i], name);
+				}
+			} else {
+				remove(el, name);
 			}
 			
-			switch( option.position ){
-				case 'top':
-					cssObj.top = -size;
-					cssObj.height = size;
-					cssObj.left = 0;
-					cssObj.width = '100%';
-					move = {on: {y: size + offset}, off: {y: 0}};
-					break;
-				case 'bottom':
-					cssObj.bottom = -size;
-					cssObj.height = size;
-					cssObj.left = 0;
-					cssObj.width = '100%';
-					move = {on: {y: -(size + offset)}, off: {y: 0}};
-					break;
-				case 'left':
-					cssObj.top = 0;
-					cssObj.height = '100%';
-					cssObj.left = -size;
-					cssObj.width = size;
-					move = {on: {x: size + offset}, off: {x: 0}};
-					break;
-				case 'right':
-					cssObj.top = 0;
-					cssObj.height = '100%';
-					cssObj.right = -size;
-					cssObj.width = size;
-					move = {on: {x: -(size + offset)}, off: {x: 0}};
-					break;
-			}
-			return cssObj
 		}
-		
-		return this;
-		
+
+
+		function calculateMove (position, size, offset) {
+			size = calculatePixel(size);
+
+			switch (position) {
+			case 'top':
+				move = {on: {y: size + offset}, off: {y: 0}};
+				break;
+			case 'bottom':
+				move = {on: {y: -(size + offset)}, off: {y: 0}};
+				break;
+			case 'left':
+				move = {on: {x: size + offset}, off: {x: 0}};
+				break;
+			case 'right':
+				move = {on: {x: -(size + offset)}, off: {x: 0}};
+				break;
+			}
+
+		}
+
+
+		function merge(obj1, obj2){
+			var obj3 = {};
+			var attrname;
+
+			for (attrname in obj1) {
+				obj3[attrname] = obj1[attrname];
+			}
+
+			for (attrname in obj2) {
+				obj3[attrname] = obj2[attrname];
+			}
+
+			return obj3;
+		}
+
+
+		function createPageOverlay () {
+			var el = document.createElement('div');
+			el.setAttribute('class', 'temp-pageOverlay');
+			el.style.width    = '100%';
+			el.style.height   = '100%';
+			el.style.position = (option.fixedPosition) ? 'fixed' : 'absolute';
+			el.style.top      = '0';
+			el.style.cursor   = 'pointer';
+			el.style.display  = 'none';
+
+			el.show = function () {
+				this.style.display = 'block';
+			};
+			el.hide = function () {
+				this.style.display = 'none';
+			};
+
+			return el;
+		}
+
 	};
-	
- })(jQuery);
+
+} ));

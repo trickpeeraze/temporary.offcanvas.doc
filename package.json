@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "A jQuery plugin for magic canvas on your web",
   "main": "index.html",
-  "dependencies": {
-    "grunt": "^0.4.5"
-  },
+  "dependencies": {},
   "devDependencies": {
     "grunt": "^0.4.5"
   },
