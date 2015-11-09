@@ -15,7 +15,7 @@
  *
  */
 
-/* global module, document, window, setTimeout, clearTimeout */
+/* global module, document, window, setTimeout, clearTimeout, Event */
 (function (root, factory, define) {
 
 	if (typeof define === 'function' && define.amd) {
@@ -34,7 +34,6 @@
 		}
 
 		var
-			_this = this,
 			defaults = {
 				debug: false,
 				content: '',
@@ -49,154 +48,71 @@
 				fixedPosition: true,
 				pushAndPull: false,
 				tapToClose: true,
-				toggleButtonSelector: null,
-				onBeforeOpen: function(){},
-				onOpen: function(){},
-				onBeforeClose: function(){},
-				onClose: function(){}
+				toggleButtonSelector: null
 			},
 			option = merge(defaults, options),
 			elContainer = document.getElementById(containerId),
 			elPageOverlay = null,
 			elCanvas,
 			move,
-			poolingRate;
-
-		init();
+			poolingRate,
+			isClose = true,
+			isOpen  = false,
+			openEvent   = new Event('open'),
+			closeEvent  = new Event('close');
 
 		/**
 		 * Properties
 		 */
-		this.isOpen  = false;
-		this.isClose = true;
+		this.isOpen  = isOpen;
+		this.isClose = isClose;
 
 		/**
 		 * Methods
 		 */
-		this.open = function (callback) {
+		this.open    = open;
+		this.close   = close;
+		this.resize  = resize;
+		this.destroy = destroy;
+		this.on  = on;
+		this.off = off;
 
-			if (!elCanvas) {
-				return;
-			}
-
-			callback = callback || option.onOpen;
-			option.onBeforeOpen(elCanvas, elContainer); /* Event: before loaded */
-
-			if (this.isClose) {
-
-				if(option.pushAndPull){
-					transition(elContainer.firstChild, move.on, option.duration, option.easing, option.delay);
-				}
-
-				if (elPageOverlay) {
-					elPageOverlay.show();
-				}
-
-				elCanvas.open(callback);
-
-				this.isOpen  = true;
-				this.isClose = false;
-			}
-
-		};
+		init();
 
 
-		this.close = function (callback) {
+		//////////////////////////////////////
 
-			if (!elCanvas) {
-				return;
-			}
-
-			callback = callback || option.onClose;
-			option.onBeforeClose(elCanvas, elContainer);
-
-			if (this.isOpen) {
-
-				if (option.pushAndPull) {
-					transition(elContainer.firstChild, move.off, option.duration, option.easing, option.delay);
-				}
-
-				if (elPageOverlay) {
-					elPageOverlay.hide();
-				}
-
-				elCanvas.close(callback);
-
-				this.isOpen  = false;
-				this.isClose = true;
-			}
-
-		};
-
-		
-		this.resize = function () {
-			this.close();
-			resize(elCanvas, option.position, option.size);
-			calculateMove(option.position, option.size, option.offset);
-		};
-
-
-		this.destroy = function () {
+		function destroy() {
 			elContainer.removeChild(elCanvas);
-		};
-
-		/**
-		 * Functions
-		 */
-		function init () {
-			calculateMove(option.position, option.size, option.offset);
-			elCanvas = createCanvas(option);
-			elCanvas.innerHTML = option.content;
-
-			if (elContainer.style.position !== 'absolute') {
-				elContainer.style.position = 'relative';
-			}
-
-			if(! option.fixedPosition ){
-				elContainer.style.overflow = 'hidden';
-			}
-
-			elContainer.appendChild(elCanvas);
-
-			if (option.tapToClose) {
-
-				elPageOverlay = createPageOverlay();
-				elContainer.insertBefore(elPageOverlay, elCanvas);
-
-				elPageOverlay.addEventListener('click', function () {
-					_this.close();
-				});
-
-			}
-
-			var btnNodeList = document.querySelectorAll(option.toggleButtonSelector);
-
-			if (btnNodeList.length) {
-				for (var i = 0; i < btnNodeList.length; ++i) {
-					bindButton(btnNodeList[i]);
-				}
-			}
-			
-			if ((/%$/).test(option.size)) {
-				window.addEventListener('resize', function () {
-
-					if (poolingRate) {
-						clearTimeout(poolingRate);
-					}
-
-					poolingRate = setTimeout(function () {
-						_this.resize();
-					}, 250);
-
-				}, false);
-			}
-
 		}
 
 
-		/* recalculate pixel from percentage unit by its elContainer */
 		function calculatePixel (val) {
 			return ( (/%$/).test(val) ) ? Math.floor(elContainer.offsetWidth * parseInt(val) / 100) : parseInt(val);
+		}
+
+
+		function toPixel (point, minus) {
+			minus = minus || false;
+			return (minus) ? (-point) + 'px' : point + 'px';
+		}
+		
+		
+		function on (type, listener, useCapture) {
+			useCapture = useCapture || false;
+			elCanvas.addEventListener(type, listener, useCapture);
+		}
+		
+		function off (type, listener ,useCapture) {
+			useCapture = useCapture || false;
+			elCanvas.removeEventListener(type, listener, useCapture);
+		}
+
+
+		function resize () {
+			this.close();
+			calculateSize(elCanvas, option.position, option.size);
+			calculateMove(option.position, option.size, option.offset);
 		}
 
 
@@ -204,10 +120,10 @@
 			btn.addEventListener('click' ,function (e) {
 				e.preventDefault();
 
-				if(_this.isClose){
-					_this.open();
+				if(isClose){
+					open();
 				} else {
-					_this.close();
+					close();
 				}
 
 				return false;
@@ -215,6 +131,72 @@
 		}
 
 
+		function open (callback) {
+
+			if (!elCanvas || isOpen) {
+				return;
+			}
+
+			if (option.pushAndPull) {
+				transition(elContainer.firstChild, move.on, option.duration, option.easing, option.delay);
+			}
+
+			if (elPageOverlay) {
+				elPageOverlay.show();
+			}
+
+			if (option.toggleButtonSelector) {
+				addClass(document.querySelectorAll(option.toggleButtonSelector), 'active');
+			}
+
+			addClass(elCanvas, 'active');
+			transition(elCanvas, move.on, option.duration, option.easing, option.delay, function () {
+				elCanvas.dispatchEvent(openEvent);
+				
+				if (typeof callback === 'function') {
+					callback();
+				}
+				
+			});
+
+			isOpen  = true;
+			isClose = false;
+		}
+
+
+		function close (callback) {
+
+			if (!elCanvas || isClose) {
+				return;
+			}
+
+			if (option.pushAndPull) {
+				transition(elContainer.firstChild, move.off, option.duration, option.easing, option.delay);
+			}
+
+			if (elPageOverlay) {
+				elPageOverlay.hide();
+			}
+
+			if (option.toggleButtonSelector) {
+				removeClass(document.querySelectorAll(option.toggleButtonSelector), 'active');
+			}
+
+			removeClass(elCanvas, 'active');
+			transition(elCanvas, move.off, option.duration, option.easing, option.delay, function () {
+				elCanvas.dispatchEvent(closeEvent);
+				
+				if (typeof callback === 'function') {
+					callback();
+				}
+			
+			});
+
+			isOpen  = false;
+			isClose = true;
+		}
+		
+		
 		function createCanvas (option) {
 
 			var el = document.createElement('div');
@@ -224,35 +206,15 @@
 			el.style.boxSizing = 'border-box';
 			el.style.overflow  = 'auto';
 
-			resize(el, option.position, option.size);
-
-			el.open = function (callback) {
-				addClass(this, 'active');
-
-				if (option.toggleButtonSelector) {
-					addClass(document.querySelectorAll(option.toggleButtonSelector), 'active');
-				}
-
-				transition(this, move.on, option.duration, option.easing, option.delay, callback);
-			};
-
-			el.close = function (callback) {
-				removeClass(this, 'active');
-
-				if (option.toggleButtonSelector) {
-					removeClass(document.querySelectorAll(option.toggleButtonSelector), 'active');
-				}
-
-				transition(this, move.off, option.duration, option.easing, option.delay, callback);
-			};
+			calculateSize(el, option.position, option.size);
 
 			return el;
 		}
 		
 		
-		function resize (el, position, size) {
+		function calculateSize (el, position, size) {
 			size = calculatePixel(size);
-
+			
 			switch (position) {
 			case 'top':
 				el.style.height = toPixel(size);
@@ -279,13 +241,7 @@
 				el.style.height = '100%';
 				break;
 			}
-
-		}
-
-
-		function toPixel (point, minus) {
-			minus = minus || false;
-			return (minus) ? (-point) + 'px' : point + 'px';
+			
 		}
 
 
@@ -294,10 +250,11 @@
 			var y = move.y || 0;
 
 			if (typeof callback === 'function') {
-				el.addEventListener('oanimationend animationend webkitAnimationEnd', function(e) {
-					e.target.removeEventListener(e.type, arguments.callee);
+				var listener = function(e) {
+					e.target.removeEventListener(e.type, listener, false);
 					callback(el);
-				}, false);
+				};
+				el.addEventListener('oanimationend animationend webkitAnimationEnd', listener, false);
 			}
 
 			el.style.transform = 'translate3d(0,0,0)';
@@ -314,7 +271,7 @@
 				var cl = el.getAttribute('class');
 				el.setAttribute('class', cl + ' ' + name);
 			};
-
+			
 			if (el.length) {
 				for (var i = 0; i < el.length; ++i) {
 					add(el[i], name);
@@ -322,7 +279,7 @@
 			} else {
 				add(el, name);
 			}
-
+			
 		}
 
 
@@ -398,6 +355,57 @@
 			};
 
 			return el;
+		}
+
+
+		function init () {
+			calculateMove(option.position, option.size, option.offset);
+			elCanvas = createCanvas(option);
+			elCanvas.innerHTML = option.content;
+
+			if (elContainer.style.position !== 'absolute') {
+				elContainer.style.position = 'relative';
+			}
+
+			if(! option.fixedPosition ){
+				elContainer.style.overflow = 'hidden';
+			}
+
+			elContainer.appendChild(elCanvas);
+
+			if (option.tapToClose) {
+
+				elPageOverlay = createPageOverlay();
+				elContainer.insertBefore(elPageOverlay, elCanvas);
+
+				elPageOverlay.addEventListener('click', function () {
+					close();
+				});
+
+			}
+
+			var btnNodeList = document.querySelectorAll(option.toggleButtonSelector);
+
+			if (btnNodeList.length) {
+				for (var i = 0; i < btnNodeList.length; ++i) {
+					bindButton(btnNodeList[i]);
+				}
+			}
+
+			if ((/%$/).test(option.size)) {
+				window.addEventListener('resize', function () {
+
+					if (poolingRate) {
+						clearTimeout(poolingRate);
+					}
+
+					poolingRate = setTimeout(function () {
+						resize();
+					}, 250);
+
+				}, false);
+			}
+
 		}
 
 	};
